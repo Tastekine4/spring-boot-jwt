@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/message")
 public class MessageController {
-
     @GetMapping
-    public ResponseEntity<String> getMessage(){
+    public ResponseEntity<String> getMessage() {
         return ResponseEntity.ok("Hello JWT!");
     }
 }

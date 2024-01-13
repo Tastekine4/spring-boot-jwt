@@ -13,29 +13,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenManager {
 
-    private static final String secretKey = "tastekineCodeSpace";
+//    private static final String secretKey = "tastekineCodeSpace";
 
-    private static final int validityTime = 5 * 60 * 1000;  // millisecond
+    private static final int validity = 5 * 60 * 1000;  // millisecond
+    Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String generateToken(String userName) {
-        String jws = Jwts.builder()
-                .setSubject(userName)
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
                 .setIssuer("www.tastekine.com")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + validityTime))
-                .signWith(SignatureAlgorithm.ES256, secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + validity))
+                .signWith(key)
                 .compact();
-        return jws;
     }
 
     public boolean tokenValidate(String token) {
-        if (getUserNameFromToken(token) != null && isExpired(token)) {
+        if (getUserNameToken(token) != null && isExpired(token)) {
             return true;
         }
         return false;
     }
 
-    public String getUserNameFromToken(String token) {
+    public String getUserNameToken(String token) {
         // Claims are the tokens attributes that we set on the generateToken method.
         Claims claims = getClaims(token);
         // We just need userName so set it in subject -->
@@ -44,10 +44,10 @@ public class TokenManager {
 
     public boolean isExpired(String token) {
         Claims claims = getClaims(token);
-        return (claims.getExpiration().before(new Date(System.currentTimeMillis())));
+        return claims.getExpiration().after(new Date(System.currentTimeMillis()));
     }
 
-    private static Claims getClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    private Claims getClaims(String token) {
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 }
