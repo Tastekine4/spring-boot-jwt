@@ -39,6 +39,11 @@ public class WebSecurityConfugiration extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    /**
+     * What we do here is simply don't expect token in login api let everybody to in.
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
